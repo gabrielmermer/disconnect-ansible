@@ -1,0 +1,54 @@
+---
+# tasks file for essential
+- name: Update installed packages
+  apt:
+    update_cache: yes
+    upgrade: yes
+
+
+- name: Update cache and install all packages
+  apt:
+    update_cache: yes
+    name: 
+      - iperf3
+        # - curl
+      - python3
+      - python3-pip
+      # don't know why this package is here
+      # - python-pip
+      - git
+      # pip dependency
+      - virtualenv
+      - vim
+      - neovim
+        # for cron jobs
+      - rsync
+      - neofetch
+      # automatic packages upgrades
+      - unattended-upgrades
+      - apt-listchanges
+      - ranger
+      - tmux
+      - htop
+      - openssh-server
+      - nfs-common
+      - mosh
+      - matchbox-keyboard
+      - npm
+    state: latest
+
+- name: Enable passwordless sudo for "{{ username }}"
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: "^%whell"
+    line: "{{ username }} ALL=(ALL) NOPASSWD: ALL"
+    validate: "/usr/sbin/visudo -cf %s"
+
+- name: Install QEMU agent if on KVM
+  become: yes
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - qemu-guest-agent
+  when: vm  == true

@@ -1,0 +1,78 @@
+---
+# tasks file for docker
+- name: Get all the Docker packages
+  apt:
+    update_cache: true
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - virtualenv
+      - python3-pip
+      - python3-setuptools
+      - gnupg
+      - lsb-release
+    state: latest
+
+- name: Add Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu bionic stable
+    state: present
+
+- name: Update apt cache and install docker-ce
+  apt: 
+    update_cache: true
+    name: 
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: latest
+
+    #- name: Install Docker module for Python
+    #  pip:
+    #    name: docker
+    #    state: latest
+
+# - name: Install Docker-compose
+#   get_url: 
+#     url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+#     dest: /usr/local/bin/docker-compose
+#     mode: 'u+x,g+x,a+x'
+
+# supported in docker natively
+#- name: Install Docker-compose
+#  pip:
+#    name: docker-compose
+#    state: latest
+
+- name: Ensure group "docker" exists with correct gid
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+
+- name: add home user to docker group
+  become: true
+  user:
+    # current running user
+    name: "{{ username }}"
+    groups: docker
+    append: yes
+
+- name: enable containerd service
+  become: true
+  systemd:
+    name: containerd
+    enabled: yes
+
+- name: enable docker service
+  become: true
+  systemd:
+    name: docker
+    enabled: yes

@@ -1,0 +1,10 @@
+---
+fh:
+  hosts:
+    disconnect:
+      ansible_host: 100.82.32.162
+      ansible_user: disconnect
+      username: disconnect
+      ansible_connection: ssh
+      ansible_ssh_private_key_file:	~/.ssh/disconnect
+      vm: false

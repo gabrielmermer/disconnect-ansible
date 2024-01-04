@@ -1,0 +1,20 @@
+---
+# tasks file for disconnect-repo
+- name: Update installed packages
+  apt:
+    update_cache: yes
+    upgrade: yes
+
+- name: Clone the Git repository
+  git:
+    repo: https://github.com/gabrielmermer/disconnect
+    dest: /home/{{ username }}/disconnect
+
+- name: Set ownership of the cloned repository
+  become: yes
+  file:
+    path: /home/{{ username }}/disconnect 
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    recurse: yes
